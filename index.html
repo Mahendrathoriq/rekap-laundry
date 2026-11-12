@@ -72,10 +72,23 @@ tfoot td{font-weight:700;background:var(--hv)}
 .lnk{float:right;border:0;background:none;color:var(--navy);font:600 12px inherit;cursor:pointer;padding:0}
 .note{color:var(--mu);font-size:12px;margin-top:14px}
 @media(max-width:900px){.cards{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.kpi .v{font-size:18px}}
+.hbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:14px}.hbar .tabs{margin:0}
+.acts{display:flex;gap:8px}.add{font-weight:600}#oS{color:var(--ok)}#oE{color:var(--neg)}
+.nav select{width:auto;padding:8px 6px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);place-items:center;z-index:15;padding:16px}.modal.on{display:grid}.modal .card{width:min(460px,100%);max-height:92vh;overflow:auto}
+.miss td:first-child::after{content:" \2022";color:var(--neg)}.warnb{background:var(--tbg);color:var(--t);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px}
+.tool{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:12px}.tool select{width:auto}
+.ban{display:flex;justify-content:space-between;align-items:center;background:var(--navy);color:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:12px}.ban b{font-size:20px}
+.pl{border-radius:14px;padding:16px 18px;color:#fff;margin-bottom:16px}.pl.pos{background:#2f855a}.pl.min{background:#c0392b}.pl b{display:block;font-size:26px}
+.donut{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:8px 0 6px}.ring{width:150px;height:150px;border-radius:50%;position:relative}.ring::after{content:"";position:absolute;inset:32px;border-radius:50%;background:var(--card)}
+.lg{display:grid;gap:4px;font-size:12px}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.wd{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:4px 0;font-size:13px}.hb2{height:10px;border-radius:99px;background:var(--hv);overflow:hidden}.hb2 i{display:block;height:100%;background:var(--sage)}
+@media print{.side,header,.cards,.hbar,.note,.toast,.tool,.modal,#gate{display:none!important}.layout{display:block}body{background:#fff}.card{box-shadow:none;border:0}}
+.kasir .cards,.kasir .side,.kasir #tabs,.kasir .nav select,.kasir #prev,.kasir #next{display:none!important}.kasir .hbar{justify-content:flex-end}
 </style></head><body><div class="wrap">
 <header>
  <div class="brand"><div class="logo">K</div><div><h1>Kedai Rapi Laundry</h1><div class="sub">Rekap setoran Smartlink &amp; pengeluaran harian<span id="sync"></span></div></div></div>
- <div class="nav"><button class="btn" id="prev" aria-label="Bulan sebelumnya">‹</button><div class="month" id="mlabel"></div><button class="btn" id="next" aria-label="Bulan berikutnya">›</button><button class="btn" id="theme" aria-label="Ganti tema">◐</button></div>
+ <div class="nav"><button class="btn" id="prev" aria-label="Bulan sebelumnya">‹</button><select id="mm" aria-label="Bulan"></select><select id="yy" aria-label="Tahun"></select><button class="btn" id="next" aria-label="Bulan berikutnya">›</button><button class="btn" id="theme" aria-label="Ganti tema">◐</button></div>
 </header>
 <section class="cards" id="cards"></section>
 <div class="layout">
@@ -83,26 +96,31 @@ tfoot td{font-weight:700;background:var(--hv)}
   <div class="card"><h2><span class="dot" style="background:var(--ok)"></span>Catat Setoran Smartlink</h2>
    <label for="sd">Tanggal</label><input type="date" id="sd">
    <div class="row2"><div><label for="st">Tunai</label><input type="number" id="st" inputmode="numeric" min="0" placeholder="0"></div><div><label for="sn">Non-Tunai (QRIS/Transfer)</label><input type="number" id="sn" inputmode="numeric" min="0" placeholder="0"></div></div>
+   <label for="sk">Keterangan (opsional)</label><input id="sk" maxlength="80" placeholder="mis. tunai dibulatkan dari Rp …">
    <button class="primary" id="saveS">Simpan Setoran</button></div>
   <div class="card"><h2><span class="dot" style="background:var(--neg)"></span>Catat Pengeluaran</h2>
    <label for="ed">Tanggal</label><input type="date" id="ed">
    <div class="row2"><div><label for="ek">Kategori <button type="button" class="lnk" id="addk">+ Baru</button></label><select id="ek"></select></div><div><label for="ea">Jumlah (Rp)</label><input type="number" id="ea" inputmode="numeric" min="0" placeholder="0"></div></div>
    <div id="newk" style="display:none;margin-top:8px"><div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input id="nk" placeholder="Nama kategori baru" maxlength="30"><button type="button" class="btn" id="oknk">Tambah</button></div></div>
    <label for="ex">Keterangan</label><input id="ex" placeholder="mis. isi ulang LPG 12 kg">
+   <details class="dt" style="margin-top:6px"><summary style="padding:6px 0;color:var(--mu)">Barang untuk riwayat harga (opsional)</summary><label for="ei">Barang</label><select id="ei"><option value="">— tidak dipilih —</option><option>Token Listrik PLN</option><option>Gas</option><option>Detergen</option><option>Parfum</option></select><div class="row2"><div><label for="ej">Jumlah</label><input type="number" id="ej" inputmode="decimal" min="0" step="any" placeholder="mis. 2"></div><div><label for="eu">Satuan</label><input id="eu" placeholder="tabung / kg / liter" maxlength="12"></div></div></details>
    <label>Dibayar dengan</label>
    <div class="seg" id="seg"><button data-m="Tunai" class="on">Tunai</button><button data-m="Transfer">Transfer</button><button data-m="QRIS">QRIS</button></div>
    <div class="hint" id="hint"></div>
    <button class="primary" id="saveE">Tambah Pengeluaran</button></div>
-  <div class="card"><h2>Saldo Awal Bulan</h2>
+  <div class="card"><h2>Saldo Awal Bulan<span id="lkh"></span></h2>
    <div class="row2"><div><label for="ot">Kas Tunai</label><input type="number" id="ot" inputmode="numeric"></div><div><label for="on">Non-Tunai</label><input type="number" id="on" inputmode="numeric"></div></div>
-   <div class="note" style="margin-top:8px">Otomatis meneruskan saldo akhir bulan lalu. Ubah jika saldo nyata berbeda.</div></div>
+   <div class="note" style="margin-top:8px">Otomatis meneruskan saldo akhir bulan lalu. Ubah jika saldo nyata berbeda.</div><button class="btn" id="blk" style="width:100%;margin-top:10px"></button></div>
   <div class="card"><h2>Data &amp; Cadangan</h2>
    <button class="btn" id="bsheet" style="width:100%;margin-bottom:8px">Buka Google Sheet</button>
-   <button class="btn" id="bcsv" style="width:100%">Unduh bulan ini (Excel/CSV)</button>
+   <button class="btn" id="bxls" style="width:100%;margin-bottom:8px">Unduh Excel (.xlsx)</button>
+   <button class="btn" id="bpdf" style="width:100%;margin-bottom:8px">Cetak / simpan PDF</button>
+   <button class="btn" id="bwa" style="width:100%">Kirim ringkasan ke WhatsApp</button>
+   <button class="btn" id="blog" style="width:100%;margin-top:8px">Catatan perubahan</button>
    <div class="note" style="margin-top:8px">Semua data tersimpan di Google Sheet milik Anda, jadi sheet itu sekaligus menjadi cadangannya.</div></div>
  </aside>
  <main class="card">
-  <div class="tabs" id="tabs"><button data-t="harian" class="on">Harian</button><button data-t="exp">Pengeluaran</button><button data-t="sum">Ringkasan</button></div>
+  <div class="hbar"><div class="tabs" id="tabs"><button data-t="harian" class="on">Harian</button><button data-t="exp">Pengeluaran</button><button data-t="sum">Ringkasan</button><button data-t="item">Harga &amp; Stok</button></div><div class="acts"><button class="btn add" id="oS">+ Setoran</button><button class="btn add" id="oE">+ Pengeluaran</button></div></div>
   <div id="view"></div>
   <div class="note">Pengeluaran tunai mengurangi Kas Tunai; Transfer/QRIS mengurangi Saldo Non-Tunai.</div>
  </main>
@@ -110,7 +128,7 @@ tfoot td{font-weight:700;background:var(--hv)}
 <div id="gate" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:20;padding:16px"><div class="card" style="width:min(360px,100%)"><h2>Masuk</h2><label for="tk">Kode akses</label><input id="tk" type="password" autocomplete="current-password" placeholder="Kode dari skrip Google Anda"><button class="primary" id="oktk">Masuk</button><div class="note" id="tkerr" style="color:var(--neg)"></div><div class="note">Cukup diisi sekali di tiap perangkat.</div></div></div>
 <div class="toast" id="toast"><span id="tmsg"></span><button id="undo">Batalkan</button></div>
 <script>
-const K0=["Gaji/Upah","LPG","Listrik","Air","Perlengkapan Cuci","Packaging","Maintenance/Perbaikan","Sewa","Transport","Lain-lain"];
+const K0=["Gaji/Upah","LPG","Listrik","Air","Perlengkapan Cuci","Packaging","Maintenance/Perbaikan","Sewa","Transport","Lain-lain","Bahan Baku","Operasional","Perlengkapan","Perawatan","Utilitas","Wifi/Paket Data","Deposit Karyawan"];
 const BL=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const $=i=>document.getElementById(i),pad=n=>String(n).padStart(2,"0");
 const now=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
@@ -121,15 +139,22 @@ let st={opening:{},setoran:{},exp:[]};
 const API="https://script.google.com/macros/s/AKfycbw4bpwPHmdMbofpESFzfaEQjIHR2-x9XPSlTQsUsLZH8q0ACN8LXvn8BXKHh1ClnxEHbQ/exec";
 const SY={conn:"Memuat data…",saved:"☁ Tersimpan di Google Sheet Anda",saving:"☁ Menyimpan…",error:"⚠ Gagal tersambung ke Google Sheet"};
 const setSync=s=>{const e=$("sync");e.textContent=" · "+SY[s];e.style.color=s==="error"?"var(--neg)":s==="saved"?"var(--ok)":""};
-let sheetUrl="",busy=0;
+let sheetUrl="",busy=0,fq="",fk="",fm="",flushing=false,role="owner",locked=false,itemsCache=null,editId=null;const pc={};
 const tok=()=>{try{return localStorage.getItem("krl_tok")||""}catch(e){return""}};
 function askTok(msg){$("gate").style.display="grid";$("tkerr").textContent=msg;$("tk").focus()}
 async function api(a,p){const r=await fetch(API,{method:"POST",body:JSON.stringify({token:tok(),a,...p})});const j=await r.json();
- if(!j.ok){if(j.err==="unauthorized"){try{localStorage.removeItem("krl_tok")}catch(e){}askTok("Kode akses salah, coba lagi.")}throw new Error(j.err)}return j}
-async function send(a,p){busy++;setSync("saving");try{await api(a,p);busy--;if(!busy)setSync("saved")}catch(e){busy--;setSync("error");toast("Gagal menyimpan ke Google Sheet. Periksa koneksi lalu coba lagi.")}}
+ if(!j.ok){if(j.err==="unauthorized"){try{localStorage.removeItem("krl_tok")}catch(e){}askTok("Kode akses salah, coba lagi.")}const er=new Error(j.err);er.srv=j.err!=="unauthorized";throw er}return j}
+const getQ=()=>{try{return JSON.parse(localStorage.getItem("krl_q")||"[]")}catch(e){return[]}};
+const setQ=q=>{try{localStorage.setItem("krl_q",JSON.stringify(q))}catch(e){}};
+async function flush(){if(flushing)return;flushing=true;let re=false;const q=getQ();if(q.length)setSync("saving");
+ while(q.length){try{await api(q[0].a,q[0].p);q.shift();setQ(q)}catch(e){if(e&&e.srv){q.shift();setQ(q);re=true;toast(e.message==="locked"?"Bulan itu dikunci, perubahan ditolak":"Server menolak perubahan ("+e.message+")");continue}break}}
+ flushing=false;if(re)setTimeout(()=>loadMonth(true),50);const n=getQ().length;if(n){setSync("error");$("sync").textContent=" · ⚠ "+n+" perubahan belum terkirim, akan dicoba lagi"}else if(tok())setSync("saved")}
+function send(a,p){itemsCache=null;setQ([...getQ(),{a,p}]);flush()}
+window.addEventListener("online",flush);setInterval(()=>{if(getQ().length)flush()},30000);
 async function loadMonth(q){if(!q){st={opening:{},setoran:{},exp:[],kats:st.kats||[]};render();setSync("conn")}
  if(!tok())return askTok("");
- try{const j=await api("load",{month:mk});if(j.month!==mk)return;st={opening:{[mk]:j.opening},setoran:j.setoran,exp:j.exp,kats:j.kats};sheetUrl=j.sheetUrl||"";setSync("saved");render();loadSetoran()}catch(e){setSync("error")}}
+ await flush();if(getQ().length){render();return}
+ try{const j=await api("load",{month:mk});if(j.month!==mk)return;st={opening:{[mk]:j.opening},setoran:j.setoran,exp:j.exp,kats:j.kats};sheetUrl=j.sheetUrl||"";role=j.role||"owner";locked=!!j.locked;document.body.classList.toggle("kasir",role==="kasir");if(role==="kasir"){$("sd").min=$("ed").min=prevDay(now());$("sd").max=$("ed").max=now()}setSync("saved");render();loadSetoran()}catch(e){setSync("error")}}
 function dl(name,data){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"text/csv;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 let mk=now().slice(0,7),tab="harian",met="Tunai",undoFn=null,tt;
 const cats=()=>[...new Set([...K0,...(st.kats||[]),...st.exp.map(e=>e.kat)])];
@@ -145,13 +170,40 @@ function calc(k){const[y,m]=k.split("-").map(Number),N=new Date(y,m,0).getDate()
 const money=(n,cls="")=>n?`<span class="${n<0?"neg":cls}">${rp(n)}</span>`:`<span class="z">–</span>`;
 function toast(msg,fn){$("tmsg").textContent=msg;undoFn=fn;$("undo").style.display=fn?"":"none";$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("on"),4500)}
 function hint(){const d=$("ed").value,a=num($("ea").value),T=met==="Tunai";let b=null;
- if(d&&d.slice(0,7)===mk){const x=calc(mk).days.find(z=>z.d===d);if(x)b=T?x.bt:x.bn}
+ if(role!=="kasir"&&d&&d.slice(0,7)===mk){const x=calc(mk).days.find(z=>z.d===d);if(x)b=T?x.bt:x.bn}
  const bad=b!=null&&a>b;$("hint").className="hint"+(bad?" warn":"");
  $("hint").textContent=(T?"Mengurangi Kas Tunai":"Mengurangi Saldo Non-Tunai")+(b!=null?" · saldo di tanggal itu "+rp(b):"")+(bad?" — saldo tidak cukup":"")}
-function loadSetoran(){const s=st.setoran[$("sd").value]||{t:0,n:0};$("st").value=s.t||"";$("sn").value=s.n||""}
+function loadSetoran(){const s=st.setoran[$("sd").value]||{t:0,n:0};$("st").value=s.t||"";$("sn").value=s.n||"";$("sk").value=s.k||""}
+const expRow=e=>`<div class="exp"><div class="d"><b>${e.date.slice(8)}</b>${BL[+e.date.slice(5,7)-1].slice(0,3)}</div><div class="m"><b>${esc(e.desc||e.kat)}</b><span class="chip">${esc(e.kat)}</span><span class="chip ${e.met==="Tunai"?"T":"N"}">${e.met}</span>${e.item?`<span class="chip">${esc(e.item)}${e.qty?" · "+e.qty+" "+esc(e.unit):""}</span>`:""}</div><div class="a">${rp(e.amt)}</div>${role==="owner"?`<button class="x" data-ed="${e.id}" aria-label="Ubah">✎</button>`:""}<button class="x" data-id="${e.id}" aria-label="Hapus">×</button></div>`;
+const prevDay=d=>{const t=new Date(d+"T12:00:00");t.setDate(t.getDate()-1);return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate())};
+function kasirRender(){fillKat();const td=now();
+ $("view").innerHTML=[td,prevDay(td)].map(d=>{const s=st.setoran[d]||{t:0,n:0},L=st.exp.filter(e=>e.date===d);
+  return `<h2 style="margin-top:14px">${d===td?"Hari ini":"Kemarin"} · ${d.slice(8)}/${d.slice(5,7)}</h2><div class="exp"><div class="m"><b>Setoran Smartlink</b><span class="chip T">Tunai ${rp(s.t)}</span><span class="chip N">Non-tunai ${rp(s.n)}</span></div><button class="btn" data-sd="${d}">Ubah</button></div>`+(L.length?L.map(expRow).join(""):`<div class="note">Belum ada pengeluaran.</div>`)}).join("");
+ document.querySelectorAll("#tabs button").forEach(b=>b.classList.remove("on"))}
+function setMet(m){met=m;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x.dataset.m===m))}
+function editExpense(it){if(locked)return toast("Bulan ini dikunci. Buka kunci dulu.");editId=it.id;$("ed").value=it.date;$("ek").value=it.kat;$("ea").value=it.amt;$("ex").value=it.desc;$("ei").value=it.item||"";$("ej").value=it.qty||"";$("eu").value=it.unit||"";setMet(it.met);$("saveE").textContent="Simpan Perubahan";hint();openM(mE,"ea")}
+function renameKat(i){const old=st.kats[i],nv=(prompt("Nama baru untuk kategori “"+old+"”:",old)||"").trim().slice(0,30);if(!nv||nv===old)return;if(cats().some(k=>k.toLowerCase()===nv.toLowerCase()))return toast("Nama kategori itu sudah ada");st.kats[i]=nv;st.exp.forEach(e=>{if(e.kat===old)e.kat=nv});send("renameKat",{from:old,to:nv});render()}
+async function itemsView(){const v=$("view");v.innerHTML='<div class="empty">Memuat riwayat harga…</div>';
+ try{if(!itemsCache)itemsCache=(await api("items")).items}catch(e){v.innerHTML='<div class="empty">Gagal memuat. Periksa koneksi.</div>';return}
+ if(tab!=="item")return;
+ const td=now(),dd=(a,b)=>Math.round((new Date(a)-new Date(b))/864e5),ch=(a,b)=>b?(a>=b?"▲ naik ":"▼ turun ")+Math.abs(Math.round((a-b)/b*100))+"%":"";
+ v.innerHTML=["Token Listrik PLN","Gas","Detergen","Parfum"].map(nm=>{const L=itemsCache[nm]||[];
+  if(!L.length)return `<div class="card" style="margin-bottom:12px"><h2>${nm}</h2><div class="note" style="margin-top:0">Belum ada pembelian. Pilih “Barang” saat mencatat pengeluaran.</div></div>`;
+  const u=x=>x.qty?x.amt/x.qty:null,a=L[0],b=L[1],asc=[...L].reverse(),gaps=asc.slice(1).map((x,i)=>dd(x.date,asc[i].date)).filter(g=>g>0),avg=gaps.length?Math.round(gaps.reduce((s,g)=>s+g,0)/gaps.length):0,since=dd(td,a.date);
+  const pr=u(a)!=null&&b&&u(b)!=null?ch(u(a),u(b))+" per "+(a.unit||"satuan"):(b?ch(a.amt,b.amt)+" dari pembelian sebelumnya":"");
+  return `<div class="card" style="margin-bottom:12px"><h2>${nm}</h2><div class="note" style="margin-top:0">Terakhir dibeli ${a.date} · ${rp(a.amt)}${a.qty?` · ${a.qty} ${esc(a.unit)} (${rp(u(a))}/${esc(a.unit||"satuan")})`:""}</div>${pr?`<div style="margin:6px 0"><b>${pr}</b></div>`:""}<div class="note">${avg?`Rata-rata beli tiap ${avg} hari · sudah ${since} hari sejak pembelian terakhir${since>=avg?" — kemungkinan hampir habis":""}`:`Sudah ${since} hari sejak pembelian terakhir`}</div><div style="margin-top:8px">${L.slice(0,6).map(x=>`<div class="dr"><span>${x.date.slice(5)}</span><span class="dd">${x.qty?x.qty+" "+esc(x.unit):"–"}</span><b>${rp(x.amt)}</b></div>`).join("")}</div></div>`}).join("")}
+function fillList(){const q=fq.toLowerCase(),f=fq||fk||fm;
+ const L=st.exp.filter(e=>e.date.startsWith(mk)&&(!fk||e.kat===fk)&&(!fm||e.met===fm)&&(!q||[e.desc,e.kat,e.met].join(" ").toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ $("ban").innerHTML=`<div class="ban"><div><small>${f?"Total hasil filter":"Total pengeluaran bulan ini"}</small><br><b>${rp(L.reduce((a,e)=>a+e.amt,0))}</b></div><div style="text-align:right"><small>Jumlah transaksi</small><br><b>${L.length}</b></div></div>`;
+ $("elist").innerHTML=L.length?L.map(expRow).join(""):`<div class="empty">${f?"Tidak ada transaksi yang cocok.":"Belum ada pengeluaran bulan ini.<br>Catat lewat tombol + Pengeluaran."}</div>`}
+async function cmp(c){const pk=prevKey(mk);try{if(!pc[pk]){if(!tok()||getQ().length)return;const j=await api("load",{month:pk});pc[pk]={s:Object.values(j.setoran).reduce((a,z)=>a+z.t+z.n,0),e:j.exp.reduce((a,z)=>a+z.amt,0)}}
+ const p=pc[pk],s=c.T.st+c.T.sn,e=c.T.et+c.T.en,ch=(a,b)=>b?(a>=b?"▲ ":"▼ ")+Math.abs(Math.round((a-b)/b*100))+"%":"–";
+ if(!$("cmp")||pk!==prevKey(mk))return;
+ $("cmp").innerHTML=`<h2 style="margin-top:22px">Dibanding Bulan Lalu</h2><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Bulan ini</th><th>Bulan lalu</th><th>Perubahan</th></tr></thead><tbody>${[["Setoran",s,p.s],["Pengeluaran",e,p.e],["Selisih",s-e,p.s-p.e]].map(r=>`<tr style="cursor:default"><td>${r[0]}</td><td>${rp(r[1])}</td><td>${rp(r[2])}</td><td>${r[0]==="Selisih"?"":ch(r[1],r[2])}</td></tr>`).join("")}</tbody></table></div>`}catch(x){}}
 function render(){
- fillKat();const c=calc(mk),[y,m]=mk.split("-").map(Number);
- $("mlabel").textContent=BL[m-1]+" "+y;
+ if(role==="kasir")return kasirRender();fillKat();$("lkh").textContent=locked?" 🔒":"";$("blk").textContent=locked?"🔓 Buka kunci bulan ini":"🔒 Kunci bulan ini";const c=calc(mk),[y,m]=mk.split("-").map(Number);
+ $("mm").innerHTML=BL.map((n,i)=>`<option value="${pad(i+1)}"${i+1===m?" selected":""}>${n}</option>`).join("");
+ const y0=new Date().getFullYear();$("yy").innerHTML=[...new Set([y0-3,y0-2,y0-1,y0,y0+1,y])].sort().map(t=>`<option${t===y?" selected":""}>${t}</option>`).join("");
  $("cards").innerHTML=`
  <div class="card kpi t"><div class="lb"><span class="dot" style="background:var(--t)"></span>Saldo Kas Tunai</div><div class="v ${c.bt<0?"neg":""}">${rp(c.bt)}</div><div class="s">Awal bulan ${rp(c.o.t)}</div></div>
  <div class="card kpi n"><div class="lb"><span class="dot" style="background:var(--n)"></span>Saldo Non-Tunai</div><div class="v ${c.bn<0?"neg":""}">${rp(c.bn)}</div><div class="s">Awal bulan ${rp(c.o.n)}</div></div>
@@ -160,57 +212,82 @@ function render(){
  $("ot").value=c.o.t;$("on").value=c.o.n;
  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));
  const v=$("view");
- if(tab==="harian"){const td=now();
-  v.innerHTML=`<div class="scroll"><table><thead><tr><th>Tanggal</th><th>Setoran Tunai</th><th>Setoran Non-Tunai</th><th>Keluar Tunai</th><th>Keluar Non-Tunai</th><th>Saldo Tunai</th><th>Saldo Non-Tunai</th></tr></thead><tbody>`+
-  c.days.map(x=>`<tr data-d="${x.d}" class="${x.d===td?"today":""}"><td>${pad(x.i)} ${new Date(x.y,x.m-1,x.i).toLocaleDateString("id-ID",{weekday:"short"})}</td><td>${money(x.s.t)}</td><td>${money(x.s.n)}</td><td>${money(-x.et)}</td><td>${money(-x.en)}</td><td class="bt">${rp(x.bt).replace(/^(-?)/,"$1")}</td><td class="bn">${rp(x.bn)}</td></tr>`).join("")+
-  `</tbody><tfoot><tr><td>Total</td><td>${rp(c.T.st)}</td><td>${rp(c.T.sn)}</td><td>${rp(c.T.et)}</td><td>${rp(c.T.en)}</td><td>${rp(c.bt)}</td><td>${rp(c.bn)}</td></tr></tfoot></table></div>
+ if(tab==="harian"){const td=now(),ms=c.days.filter(x=>x.d<td&&!st.setoran[x.d]).map(x=>pad(x.i)),mb=ms.length?`<div class="warnb">⚠ ${ms.length} hari belum ada setoran: tanggal ${ms.join(", ")}. Hari libur boleh dilewati.</div>`:"";
+  v.innerHTML=mb+`<div class="scroll"><table><thead><tr><th>Tanggal</th><th>Setoran Tunai</th><th>Setoran Non-Tunai</th><th>Keluar Tunai</th><th>Keluar Non-Tunai</th><th>Saldo Tunai</th><th>Saldo Non-Tunai</th><th>Keterangan</th></tr></thead><tbody>`+
+  c.days.map(x=>`<tr data-d="${x.d}" class="${x.d===td?"today ":""}${x.d<td&&!st.setoran[x.d]?"miss":""}"><td>${pad(x.i)} ${new Date(x.y,x.m-1,x.i).toLocaleDateString("id-ID",{weekday:"short"})}</td><td>${money(x.s.t)}</td><td>${money(x.s.n)}</td><td>${money(-x.et)}</td><td>${money(-x.en)}</td><td class="bt">${rp(x.bt).replace(/^(-?)/,"$1")}</td><td class="bn">${rp(x.bn)}</td><td style="text-align:left;color:var(--mu);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((st.setoran[x.d]||{}).k||"")}</td></tr>`).join("")+
+  `</tbody><tfoot><tr><td>Total</td><td>${rp(c.T.st)}</td><td>${rp(c.T.sn)}</td><td>${rp(c.T.et)}</td><td>${rp(c.T.en)}</td><td>${rp(c.bt)}</td><td>${rp(c.bn)}</td><td></td></tr></tfoot></table></div>
   <div class="note">Klik baris tanggal untuk mengisi atau mengubah setoran hari itu.</div>`;
+ }else if(tab==="item"){itemsView();
  }else if(tab==="exp"){
-  const L=st.exp.filter(e=>e.date.startsWith(mk)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
-  v.innerHTML=L.length?L.map(e=>`<div class="exp"><div class="d"><b>${e.date.slice(8)}</b>${BL[+e.date.slice(5,7)-1].slice(0,3)}</div><div class="m"><b>${esc(e.desc||e.kat)}</b><span class="chip">${esc(e.kat)}</span><span class="chip ${e.met==="Tunai"?"T":"N"}">${e.met}</span></div><div class="a">${rp(e.amt)}</div><button class="x" data-id="${e.id}" aria-label="Hapus">×</button></div>`).join(""):`<div class="empty">Belum ada pengeluaran bulan ini.<br>Catat lewat formulir di samping.</div>`;
-  if((st.kats||[]).length)v.insertAdjacentHTML("afterbegin",`<div style="margin-bottom:12px"><small style="color:var(--mu)">Kategori buatan Anda:</small> ${st.kats.map((k,i)=>`<span class="chip">${esc(k)} <button class="x" style="font-size:14px;padding:0 2px" data-k="${i}" aria-label="Hapus kategori">×</button></span>`).join("")}</div>`);
+  v.innerHTML=`<div class="tool"><input id="fq" placeholder="Cari deskripsi, kategori, metode…" value="${esc(fq)}"><select id="fk"><option value="">Semua kategori</option>${cats().map(k=>`<option${k===fk?" selected":""}>${esc(k)}</option>`).join("")}</select><select id="fm"><option value="">Semua metode</option>${["Tunai","Transfer","QRIS"].map(k=>`<option${k===fm?" selected":""}>${k}</option>`).join("")}</select></div><div id="ban"></div><div id="elist"></div>`;
+  $("fq").oninput=e=>{fq=e.target.value;fillList()};$("fk").onchange=e=>{fk=e.target.value;fillList()};$("fm").onchange=e=>{fm=e.target.value;fillList()};fillList();
+  if((st.kats||[]).length)v.insertAdjacentHTML("afterbegin",`<div style="margin-bottom:12px"><small style="color:var(--mu)">Kategori buatan Anda:</small> ${st.kats.map((k,i)=>`<span class="chip">${esc(k)} <button class="x" style="font-size:12px;padding:0 2px" data-kr="${i}" aria-label="Ubah nama">✎</button><button class="x" style="font-size:14px;padding:0 2px" data-k="${i}" aria-label="Hapus kategori">×</button></span>`).join("")}</div>`);
  }else{
   const rows=cats().map(k=>{let t=0,n=0;st.exp.forEach(e=>{if(e.date.startsWith(mk)&&e.kat===k){if(e.met==="Tunai")t+=e.amt;else n+=e.amt}});return{k,t,n,s:t+n}});
-  const mx=Math.max(1,...rows.map(r=>r.s));
   const TT=rows.reduce((a,r)=>({t:a.t+r.t,n:a.n+r.n}),{t:0,n:0}),G=TT.t+TT.n,dash='<span class="z">–</span>';
   const tbl=`<div class="scroll"><table style="min-width:0"><thead><tr><th>Kategori</th><th>Tunai</th><th>Transfer/QRIS</th><th>Total</th><th>%</th></tr></thead><tbody>${rows.map(r=>`<tr style="cursor:default"><td>${esc(r.k)}</td><td>${r.t?rp(r.t):dash}</td><td>${r.n?rp(r.n):dash}</td><td><b>${r.s?rp(r.s):dash}</b></td><td>${r.s?Math.round(r.s/G*100)+"%":dash}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total Pengeluaran</td><td>${rp(TT.t)}</td><td>${rp(TT.n)}</td><td>${rp(G)}</td><td>${G?"100%":dash}</td></tr></tfoot></table></div>`;
+  const laba=c.T.st+c.T.sn-G,pl=`<div class="pl ${laba<0?"min":"pos"}"><small>${laba<0?"RUGI":"LABA"} KAS BULAN INI (Setoran − Pengeluaran)</small><b>${rp(laba)}</b></div>`;
+  const PAL=["#2f855a","#2b6cb0","#b7791f","#c0392b","#6b46c1","#0e7490","#be185d","#4d7c0f","#9a3412","#475569","#0d9488","#a16207"],act=rows.filter(r=>r.s);let acc=0;
+  const grad=act.map((r,i)=>{const a=acc/G*100;acc+=r.s;return PAL[i%12]+" "+a+"% "+acc/G*100+"%"}).join(",");
+  const donut=G?`<div class="donut"><div class="ring" style="background:conic-gradient(${grad})"></div><div class="lg">${act.map((r,i)=>`<span><i style="background:${PAL[i%12]}"></i>${esc(r.k)} · ${Math.round(r.s/G*100)}%</span>`).join("")}</div></div>`:`<div class="empty">Belum ada data pengeluaran.</div>`;
+  const WD=["Min","Sen","Sel","Rab","Kam","Jum","Sab"],ws=WD.map(()=>({s:0,n:0}));
+  c.days.forEach(x=>{if(st.setoran[x.d]){const w=new Date(x.y,x.m-1,x.i).getDay();ws[w].s+=x.s.t+x.s.n;ws[w].n++}});
+  const av=ws.map(z=>z.n?z.s/z.n:0),mxa=Math.max(1,...av),best=av.indexOf(Math.max(...av));
+  const wk=`<h2 style="margin-top:22px">Pola Setoran per Hari</h2>`+(av.some(a=>a)?`<div class="legend">Rata-rata setoran per hari dalam seminggu · terbaik: ${WD[best]}</div>`+[1,2,3,4,5,6,0].map(w=>`<div class="wd"><span>${WD[w]}</span><div class="hb2"><i style="width:${av[w]/mxa*100}%"></i></div><b>${av[w]?rp(av[w]):"–"}</b></div>`).join(""):`<div class="empty">Belum ada data setoran.</div>`);
   const det=`<h2 style="margin-top:22px">Daftar Transaksi per Kategori</h2>`+(rows.filter(r=>r.s).map(r=>`<details class="dt"><summary><b>${esc(r.k)}</b><span>${rp(r.s)}</span></summary>${st.exp.filter(e=>e.date.startsWith(mk)&&e.kat===r.k).sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<div class="dr"><span>${e.date.slice(8)}/${e.date.slice(5,7)}</span><span class="dd">${esc(e.desc||"–")}</span><span class="chip ${e.met==="Tunai"?"T":"N"}">${e.met}</span><b>${rp(e.amt)}</b></div>`).join("")}</details>`).join("")||`<div class="empty">Belum ada transaksi.</div>`);
-  v.innerHTML=`<h2>Posisi Kas</h2><div class="scroll" style="margin-bottom:20px"><table style="min-width:0"><thead><tr><th></th><th>Kas Tunai</th><th>Non-Tunai</th><th>Total</th></tr></thead><tbody>
+  v.innerHTML=pl+`<h2>Posisi Kas</h2><div class="scroll" style="margin-bottom:20px"><table style="min-width:0"><thead><tr><th></th><th>Kas Tunai</th><th>Non-Tunai</th><th>Total</th></tr></thead><tbody>
   ${[["Saldo awal",c.o.t,c.o.n],["Setoran Smartlink",c.T.st,c.T.sn],["Pengeluaran",-c.T.et,-c.T.en]].map(r=>`<tr style="cursor:default"><td>${r[0]}</td><td>${rp(r[1])}</td><td>${rp(r[2])}</td><td>${rp(r[1]+r[2])}</td></tr>`).join("")}
   </tbody><tfoot><tr><td>Saldo akhir</td><td>${rp(c.bt)}</td><td>${rp(c.bn)}</td><td>${rp(c.bt+c.bn)}</td></tr></tfoot></table></div>
-  <h2>Rincian Pengeluaran per Kategori</h2>${tbl}<h2 style="margin-top:22px">Grafik per Kategori</h2><div class="legend"><span><span class="dot" style="background:var(--t)"></span> Tunai</span><span><span class="dot" style="background:var(--n)"></span> Transfer/QRIS</span></div>
-  ${rows.filter(r=>r.s).map(r=>`<div class="kat"><div class="h"><b>${r.k}</b><b>${rp(r.s)}</b></div><div class="bar"><i class="bt2" style="width:${r.t/mx*100}%"></i><i class="bn2" style="width:${r.n/mx*100}%"></i></div><small>Tunai ${rp(r.t)} · Transfer/QRIS ${rp(r.n)}</small></div>`).join("")||`<div class="empty">Belum ada data pengeluaran.</div>`}${det}`;
+  <h2>Rincian Pengeluaran per Kategori</h2>${tbl}<h2 style="margin-top:22px">Komposisi Pengeluaran</h2>${donut}<div id="cmp"></div>${wk}${det}`;
+  cmp(c);
  }
  hint()}
+$("mm").onchange=$("yy").onchange=()=>{mk=$("yy").value+"-"+$("mm").value;loadMonth()};
 $("prev").onclick=()=>{mk=prevKey(mk);loadMonth()};
 $("next").onclick=()=>{let[y,m]=mk.split("-").map(Number);m++;if(m>12){m=1;y++}mk=y+"-"+pad(m);loadMonth()};
 $("theme").onclick=()=>{const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark"};
 $("tabs").onclick=e=>{const b=e.target.closest("button");if(b){tab=b.dataset.t;render()}};
 $("seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;met=b.dataset.m;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));hint()};
 $("view").onclick=e=>{
+ const sdb=e.target.closest("[data-sd]");if(sdb){$("sd").value=sdb.dataset.sd;loadSetoran();openM(mS,"st");return}
+ const ed=e.target.closest("[data-ed]");if(ed){const it=st.exp.find(z=>z.id==ed.dataset.ed);if(it)editExpense(it);return}
+ const kr=e.target.closest("[data-kr]");if(kr){renameKat(+kr.dataset.kr);return}
  const kx=e.target.closest("[data-k]");
  if(kx){const i=+kx.dataset.k,k=st.kats[i];if(st.exp.some(z=>z.kat===k))return toast("Kategori masih dipakai transaksi, tidak bisa dihapus");st.kats.splice(i,1);send("kats",{kats:st.kats});render();return}
  const x=e.target.closest(".x");
- if(x){const i=st.exp.findIndex(z=>z.id==x.dataset.id),it=st.exp[i];st.exp.splice(i,1);render();send("delExp",{id:it.id});toast("Pengeluaran dihapus",()=>{st.exp.push(it);render();send("addExp",{item:it})});return}
- const r=e.target.closest("tr[data-d]");if(r){$("sd").value=r.dataset.d;$("ed").value=r.dataset.d;loadSetoran();hint();$("st").focus()}};
+ if(x){if(locked)return toast("Bulan ini dikunci. Buka kunci dulu.");const i=st.exp.findIndex(z=>z.id==x.dataset.id),it=st.exp[i];st.exp.splice(i,1);render();send("delExp",{id:it.id});toast("Pengeluaran dihapus",()=>{st.exp.push(it);render();send("addExp",{item:it})});return}
+ const r=e.target.closest("tr[data-d]");if(r){$("sd").value=r.dataset.d;$("ed").value=r.dataset.d;loadSetoran();hint();openM(mS,"st")}};
 $("sd").onchange=loadSetoran;$("ed").onchange=hint;$("ea").oninput=hint;
 $("saveS").onclick=async()=>{const d=$("sd").value;if(!d)return toast("Pilih tanggal dulu");
- if(d.slice(0,7)!==mk){mk=d.slice(0,7);await loadMonth()}
- const t=num($("st").value),n=num($("sn").value);if(t||n)st.setoran[d]={t,n};else delete st.setoran[d];
- render();send("setoran",{date:d,t,n});toast("Setoran tanggal "+d.slice(8)+" disimpan")};
+ if(role!=="kasir"&&d.slice(0,7)!==mk){mk=d.slice(0,7);await loadMonth()}
+ if(locked)return toast("Bulan ini dikunci. Buka kunci dulu lewat tombol di Saldo Awal Bulan.");
+ const t=num($("st").value),n=num($("sn").value),k=$("sk").value.trim();if(t||n||k)st.setoran[d]={t,n,k};else delete st.setoran[d];
+ render();send("setoran",{date:d,t,n,k});toast("Setoran tanggal "+d.slice(8)+" disimpan");mS.classList.remove("on")};
 $("saveE").onclick=async()=>{const d=$("ed").value,a=num($("ea").value);if(!d||!a)return toast("Isi tanggal dan jumlah");
- if(d.slice(0,7)!==mk){mk=d.slice(0,7);await loadMonth()}
- const it={id:Date.now(),date:d,kat:$("ek").value,desc:$("ex").value.trim(),amt:a,met};st.exp.push(it);
- $("ea").value="";$("ex").value="";render();send("addExp",{item:it});toast("Pengeluaran ditambahkan · "+(met==="Tunai"?"Kas Tunai":"Saldo Non-Tunai")+" berkurang")};
-const setOpen=()=>{const o={t:+$("ot").value||0,n:+$("on").value||0};st.opening[mk]=o;render();send("opening",{month:mk,...o})};
+ if(role!=="kasir"&&d.slice(0,7)!==mk){mk=d.slice(0,7);await loadMonth()}
+ if(locked)return toast("Bulan ini dikunci. Buka kunci dulu lewat tombol di Saldo Awal Bulan.");
+ const f={date:d,kat:$("ek").value,desc:$("ex").value.trim(),amt:a,met,item:$("ei").value,qty:+$("ej").value||0,unit:$("eu").value.trim()};
+ if(editId){const it=st.exp.find(z=>z.id==editId);Object.assign(it,f);send("editExp",{item:it});editId=null;toast("Pengeluaran diperbarui")}
+ else{const it={id:Date.now(),...f};st.exp.push(it);send("addExp",{item:it});toast("Pengeluaran ditambahkan · "+(met==="Tunai"?"Kas Tunai":"Saldo Non-Tunai")+" berkurang")}
+ $("ea").value=$("ex").value=$("ej").value=$("eu").value="";$("ei").value="";$("saveE").textContent="Tambah Pengeluaran";render();mE.classList.remove("on")};
+$("ei").onchange=()=>{const m={"Token Listrik PLN":"Listrik","Gas":"LPG","Detergen":"Perlengkapan Cuci","Parfum":"Perlengkapan Cuci"}[$("ei").value];if(m)$("ek").value=m};
+$("blk").onclick=()=>{locked=!locked;send("lock",{month:mk,on:locked});render();toast(locked?"Bulan "+mk+" dikunci":"Kunci bulan dibuka")};
+$("blog").onclick=async()=>{const w=document.createElement("div");w.className="modal on";w.innerHTML='<div class="card"><h2>Catatan Perubahan<button class="x" data-close style="margin-left:auto">×</button></h2><div id="logb">Memuat…</div></div>';w.onclick=e=>{if(e.target===w||e.target.closest("[data-close]"))w.remove()};document.body.appendChild(w);
+ try{const j=await api("log");$("logb").innerHTML=j.rows.map(r=>`<div class="dr" style="flex-wrap:wrap"><span>${esc(r[0])}</span><b>${esc(r[1])}</b><span>${esc(r[2])}</span><span class="dd" style="white-space:normal;flex-basis:100%">${esc(r[3])}</span></div>`).join("")||"Belum ada catatan."}catch(e){$("logb").textContent="Gagal memuat."}};
+const setOpen=()=>{if(locked){render();return toast("Bulan ini dikunci. Buka kunci dulu.")}const o={t:+$("ot").value||0,n:+$("on").value||0};st.opening[mk]=o;render();send("opening",{month:mk,...o})};
 $("ot").onchange=setOpen;$("on").onchange=setOpen;
 $("undo").onclick=()=>{if(undoFn)undoFn();$("toast").classList.remove("on")};
-$("bcsv").onclick=()=>{const c=calc(mk),q=v=>'"'+String(v).replace(/"/g,'""')+'"';
- const L=["Tanggal;Setoran Tunai;Setoran Non-Tunai;Pengeluaran Tunai;Pengeluaran Non-Tunai;Saldo Tunai;Saldo Non-Tunai"];
- c.days.forEach(x=>L.push([x.d,x.s.t,x.s.n,x.et,x.en,x.bt,x.bn].join(";")));
- L.push("","Tanggal;Kategori;Keterangan;Jumlah;Metode");
- st.exp.filter(e=>e.date.startsWith(mk)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>L.push([e.date,e.kat,q(e.desc),e.amt,e.met].join(";")));
- dl("rekap-laundry-"+mk+".csv","\uFEFF"+L.join("\r\n"))};
+function loadXlsx(){return new Promise((res,rej)=>{if(window.XLSX)return res();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+$("bxls").onclick=async()=>{try{await loadXlsx()}catch(e){return toast("Gagal memuat pustaka Excel. Periksa koneksi.")}
+ const c=calc(mk),X=XLSX.utils,wb=X.book_new();
+ const H=c.days.map(x=>({Tanggal:x.d,"Setoran Tunai":x.s.t,"Setoran Non-Tunai":x.s.n,"Pengeluaran Tunai":x.et,"Pengeluaran Non-Tunai":x.en,"Saldo Tunai":x.bt,"Saldo Non-Tunai":x.bn,Keterangan:(st.setoran[x.d]||{}).k||""}));
+ const E=st.exp.filter(e=>e.date.startsWith(mk)).sort((a,b)=>a.date.localeCompare(b.date)).map(e=>({Tanggal:e.date,Kategori:e.kat,Keterangan:e.desc,Jumlah:e.amt,Metode:e.met}));
+ const R=cats().map(k=>{let t=0,n=0;E.forEach(e=>{if(e.Kategori===k){if(e.Metode==="Tunai")t+=e.Jumlah;else n+=e.Jumlah}});return{Kategori:k,Tunai:t,"Transfer/QRIS":n,Total:t+n}}).filter(r=>r.Total);
+ X.book_append_sheet(wb,X.json_to_sheet(H),"Harian");X.book_append_sheet(wb,X.json_to_sheet(E.length?E:[{}]),"Pengeluaran");X.book_append_sheet(wb,X.json_to_sheet(R.length?R:[{}]),"Ringkasan");
+ XLSX.writeFile(wb,"rekap-laundry-"+mk+".xlsx")};
+$("bpdf").onclick=()=>window.print();
+$("bwa").onclick=()=>{const c=calc(mk),d=$("sd").value||now(),x=c.days.find(z=>z.d===d)||c.days[0];
+ window.open("https://wa.me/?text="+encodeURIComponent(`*Rekap Kedai Rapi Laundry*\n${x.d}\nSetoran tunai: ${rp(x.s.t)}\nSetoran non-tunai: ${rp(x.s.n)}\nPengeluaran: ${rp(x.et+x.en)}\nSaldo kas tunai: ${rp(x.bt)}\nSaldo non-tunai: ${rp(x.bn)}`),"_blank")};
 $("addk").onclick=()=>{const b=$("newk"),o=b.style.display=="none";b.style.display=o?"block":"none";if(o)$("nk").focus()};
 function addKat(){const v=$("nk").value.trim().replace(/\s+/g," ");if(!v)return;const ex=cats().find(k=>k.toLowerCase()===v.toLowerCase());
  if(ex){fillKat(ex);toast("Kategori sudah ada, langsung dipilih")}else{(st.kats=st.kats||[]).push(v);send("kats",{kats:st.kats});fillKat(v);toast("Kategori “"+v+"” ditambahkan")}
@@ -219,6 +296,12 @@ $("oknk").onclick=addKat;$("nk").onkeydown=e=>{if(e.key==="Enter"){e.preventDefa
 $("bsheet").onclick=()=>{if(sheetUrl)window.open(sheetUrl,"_blank");else toast("Alamat Google Sheet belum dimuat")};
 $("oktk").onclick=()=>{const v=$("tk").value.trim();if(!v)return;try{localStorage.setItem("krl_tok",v)}catch(e){}$("gate").style.display="none";$("tk").value="";loadMonth()};
 $("tk").onkeydown=e=>{if(e.key==="Enter")$("oktk").click()};
+function mkModal(card){const w=document.createElement("div");w.className="modal";card.querySelector("h2").insertAdjacentHTML("beforeend",'<button class="x" data-close style="margin-left:auto" aria-label="Tutup">×</button>');w.appendChild(card);document.body.appendChild(w);w.onclick=e=>{if(e.target===w||e.target.closest("[data-close]"))w.classList.remove("on")};return w}
+const mS=mkModal($("saveS").closest(".card")),mE=mkModal($("saveE").closest(".card"));
+const openM=(w,f)=>{w.classList.add("on");setTimeout(()=>$(f).focus(),50)};
+$("oS").onclick=()=>{$("sd").value=$("sd").value||now();loadSetoran();openM(mS,"st")};
+$("oE").onclick=()=>{editId=null;$("saveE").textContent="Tambah Pengeluaran";$("ed").value=$("ed").value||now();hint();openM(mE,"ea")};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal.on").forEach(w=>w.classList.remove("on"))});
 $("sd").value=$("ed").value=now();loadSetoran();loadMonth();
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&tok()&&!busy)loadMonth(true)});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&tok()&&!flushing)loadMonth(true)});
 </script></body></html>
