@@ -115,9 +115,23 @@ h2{font-family:Fraunces,Georgia,serif;font-size:15px}
  .modal{place-items:end center;padding:0}.modal .card{width:100%;max-width:520px;border-radius:24px 24px 0 0;max-height:90vh}
 }
 @media print{#bnav{display:none!important}}
+html{-webkit-text-size-adjust:100%}body{overflow-x:hidden;font-variant-numeric:tabular-nums lining-nums}
+.layout>*,.cards>*{min-width:0}input,select{min-width:0;max-width:100%}
+input[type=date]{-webkit-appearance:none;appearance:none;min-height:44px;text-align:left}input[type=date]::-webkit-date-and-time-value{text-align:left}
+.hero .hv,.kpi .v{font-family:"DM Sans",-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:800;letter-spacing:-.5px}
+h2{font-family:inherit;font-weight:800}.kpi{display:flex;flex-direction:column;justify-content:center}
+.dsk td{white-space:nowrap}.dsk td.bt{background:none;color:var(--t)}.dsk td.bn{background:none;color:var(--n)}
+tr.idle td{opacity:.55}.x{display:inline-grid;place-items:center}.x svg{display:block;width:16px;height:16px}
+#blk{display:flex;gap:6px;justify-content:center;align-items:center}#blk svg,#lkh svg{width:14px;height:14px;vertical-align:-2px}
+@media(max-width:900px){
+ .layout{grid-template-columns:minmax(0,1fr)}#tabs{display:none}
+ .tool{grid-template-columns:1fr 1fr}.tool input{grid-column:1/-1}.tool select{width:100%}
+ .hero{padding:16px}.hero .hv{font-size:28px;margin-bottom:10px}.kpi{padding:12px}.kpi .v{font-size:17px}
+ .subt{display:none}.modal .card{max-height:88vh;max-height:88dvh}#bnav button{font-size:11px}
+}
 </style></head><body><div class="wrap">
 <header>
- <div class="brand"><div class="logo">K</div><div><h1>Kedai Rapi Laundry</h1><div class="sub">Rekap setoran Smartlink &amp; pengeluaran harian<span id="sync"></span></div></div></div>
+ <div class="brand"><div class="logo">K</div><div><h1>Kedai Rapi Laundry</h1><div class="sub"><span class="subt">Rekap setoran Smartlink &amp; pengeluaran harian · </span><span id="sync"></span></div></div></div>
  <div class="nav"><button class="btn" id="prev" aria-label="Bulan sebelumnya">‹</button><select id="mm" aria-label="Bulan"></select><select id="yy" aria-label="Tahun"></select><button class="btn" id="next" aria-label="Bulan berikutnya">›</button><button class="btn" id="theme" aria-label="Ganti tema">◐</button></div>
 </header>
 <section class="cards" id="cards"></section>
@@ -133,13 +147,16 @@ h2{font-family:Fraunces,Georgia,serif;font-size:15px}
    <div class="row2"><div><label for="ek">Kategori <button type="button" class="lnk" id="addk">+ Baru</button></label><select id="ek"></select></div><div><label for="ea">Jumlah (Rp)</label><input type="number" id="ea" inputmode="numeric" min="0" placeholder="0"></div></div>
    <div id="newk" style="display:none;margin-top:8px"><div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input id="nk" placeholder="Nama kategori baru" maxlength="30"><button type="button" class="btn" id="oknk">Tambah</button></div></div>
    <label for="ex">Keterangan</label><input id="ex" placeholder="mis. isi ulang LPG 12 kg">
-   <details class="dt" style="margin-top:6px"><summary id="isum" style="padding:6px 0;color:var(--mu)">Barang untuk riwayat harga (opsional)</summary><label for="ei">Barang</label><select id="ei"><option value="">— tidak dipilih —</option><option>Token Listrik PLN</option><option>Gas</option><option>Detergen Literan</option><option>Detergen Sachet</option><option>Parfum</option></select><div class="row2"><div><label for="ej">Jumlah</label><input type="number" id="ej" inputmode="decimal" min="0" step="any" placeholder="mis. 2"></div><div><label for="eu">Satuan</label><input id="eu" placeholder="tabung / kg / liter" maxlength="12"></div></div></details>
+   <label for="ei">Barang (untuk riwayat harga)</label>
+   <select id="ei"><option value="">— Bukan barang yang dipantau —</option><option>Token Listrik PLN</option><option>Gas</option><option>Detergen Literan</option><option>Detergen Sachet</option><option>Parfum</option></select>
+   <div class="hint" id="isum" style="min-height:0"></div>
+   <div class="row2" id="eq" style="display:none"><div><label for="ej">Jumlah</label><input type="number" id="ej" inputmode="decimal" min="0" step="any" placeholder="mis. 2"></div><div><label for="eu">Satuan</label><input id="eu" placeholder="tabung / kg / liter" maxlength="12"></div></div>
    <label>Dibayar dengan</label>
    <div class="seg" id="seg"><button data-m="Tunai" class="on">Tunai</button><button data-m="Transfer">Transfer</button><button data-m="QRIS">QRIS</button></div>
    <div class="hint" id="hint"></div>
    <button class="primary" id="saveE">Tambah Pengeluaran</button></div>
   <div class="card"><h2>Saldo Awal Bulan<span id="lkh"></span></h2>
-   <div class="row2"><div><label for="ot">Kas Tunai</label><input type="number" id="ot" inputmode="numeric"></div><div><label for="on">Non-Tunai</label><input type="number" id="on" inputmode="numeric"></div></div>
+   <div class="row2"><div><label for="ot">Kas Tunai</label><input id="ot" inputmode="numeric"></div><div><label for="on">Non-Tunai</label><input id="on" inputmode="numeric"></div></div>
    <div class="note" style="margin-top:8px">Otomatis meneruskan saldo akhir bulan lalu. Ubah jika saldo nyata berbeda.</div><button class="btn" id="blk" style="width:100%;margin-top:10px"></button></div>
   <div class="card"><h2>Data &amp; Cadangan</h2>
    <button class="btn" id="bsheet" style="width:100%;margin-bottom:8px">Buka Google Sheet</button>
@@ -166,10 +183,12 @@ const now=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)
 const num=v=>Math.max(0,Math.round(+v||0));
 const rp=n=>(n<0?"-":"")+"Rp "+Math.abs(Math.round(n)).toLocaleString("id-ID");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',UNLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>';
+const fmtN=n=>(+n||0).toLocaleString("id-ID"),pn=v=>+String(v).replace(/[^\d-]/g,"")||0,tgs=d=>+d.slice(8)+" "+BL[+d.slice(5,7)-1].slice(0,3),tgl=d=>tgs(d)+" "+d.slice(0,4);
 let st={opening:{},setoran:{},exp:[]};
 const API="https://script.google.com/macros/s/AKfycbw4bpwPHmdMbofpESFzfaEQjIHR2-x9XPSlTQsUsLZH8q0ACN8LXvn8BXKHh1ClnxEHbQ/exec";
 const SY={conn:"Memuat data…",saved:"☁ Tersimpan di Google Sheet Anda",saving:"☁ Menyimpan…",error:"⚠ Gagal tersambung ke Google Sheet"};
-const setSync=s=>{const e=$("sync");e.textContent=" · "+SY[s];e.style.color=s==="error"?"var(--neg)":s==="saved"?"var(--ok)":""};
+const setSync=s=>{const e=$("sync");e.textContent=SY[s];e.style.color=s==="error"?"var(--neg)":s==="saved"?"var(--ok)":""};
 let sheetUrl="",busy=0,fq="",fk="",fm="",flushing=false,role="owner",kasirHari=2,locked=false,itemsCache=null,editId=null;const pc={};
 const tok=()=>{try{return localStorage.getItem("krl_tok")||""}catch(e){return""}};
 function askTok(msg){$("gate").style.display="grid";$("tkerr").textContent=msg;$("tk").focus()}
@@ -179,7 +198,7 @@ const getQ=()=>{try{return JSON.parse(localStorage.getItem("krl_q")||"[]")}catch
 const setQ=q=>{try{localStorage.setItem("krl_q",JSON.stringify(q))}catch(e){}};
 async function flush(){if(flushing)return;flushing=true;let re=false;const q=getQ();if(q.length)setSync("saving");
  while(q.length){try{await api(q[0].a,q[0].p);q.shift();setQ(q)}catch(e){if(e&&e.srv){q.shift();setQ(q);re=true;toast(e.message==="locked"?"Bulan itu dikunci, perubahan ditolak":e.message==="forbidden_date"?"Tanggal itu di luar batas yang boleh diisi karyawan. Minta pemilik yang mengisinya.":"Server menolak perubahan ("+e.message+")");continue}break}}
- flushing=false;if(re)setTimeout(()=>loadMonth(true),50);const n=getQ().length;if(n){setSync("error");$("sync").textContent=" · ⚠ "+n+" perubahan belum terkirim, akan dicoba lagi"}else if(tok())setSync("saved")}
+ flushing=false;if(re)setTimeout(()=>loadMonth(true),50);const n=getQ().length;if(n){setSync("error");$("sync").textContent="⚠ "+n+" perubahan belum terkirim, akan dicoba lagi"}else if(tok())setSync("saved")}
 function send(a,p){itemsCache=null;setQ([...getQ(),{a,p}]);flush()}
 window.addEventListener("online",flush);setInterval(()=>{if(getQ().length)flush()},30000);
 async function loadMonth(q){if(!q){st={opening:{},setoran:{},exp:[],kats:st.kats||[]};render();setSync("conn")}
@@ -205,7 +224,7 @@ function hint(){const d=$("ed").value,a=num($("ea").value),T=met==="Tunai";let b
  const bad=b!=null&&a>b;$("hint").className="hint"+(bad?" warn":"");
  $("hint").textContent=(T?"Mengurangi Kas Tunai":"Mengurangi Saldo Non-Tunai")+(b!=null?" · saldo di tanggal itu "+rp(b):"")+(bad?" — saldo tidak cukup":"")}
 function loadSetoran(){const s=st.setoran[$("sd").value]||{t:0,n:0};$("st").value=s.t||"";$("sn").value=s.n||"";$("sk").value=s.k||""}
-const expRow=e=>`<div class="exp"><div class="d"><b>${e.date.slice(8)}</b>${BL[+e.date.slice(5,7)-1].slice(0,3)}</div><div class="m"><b>${esc(e.desc||e.kat)}</b><span class="chip">${esc(e.kat)}</span><span class="chip ${e.met==="Tunai"?"T":"N"}">${e.met}</span>${e.item?`<span class="chip">${esc(e.item)}${e.qty?" · "+e.qty+" "+esc(e.unit):""}</span>`:""}</div><div class="a">${rp(e.amt)}</div>${role==="owner"?`<button class="x" data-ed="${e.id}" aria-label="Ubah">✎</button>`:""}<button class="x" data-id="${e.id}" aria-label="Hapus">×</button></div>`;
+const expRow=e=>`<div class="exp"><div class="d"><b>${e.date.slice(8)}</b>${BL[+e.date.slice(5,7)-1].slice(0,3)}</div><div class="m"><b>${esc(e.desc||e.kat)}</b><span class="chip">${esc(e.kat)}</span><span class="chip ${e.met==="Tunai"?"T":"N"}">${e.met}</span>${e.item?`<span class="chip">${esc(e.item)}${e.qty?" · "+e.qty+" "+esc(e.unit):""}</span>`:""}</div><div class="a">${rp(e.amt)}</div>${role==="owner"?`<button class="x" data-ed="${e.id}" aria-label="Ubah">${PEN}</button>`:""}<button class="x" data-id="${e.id}" aria-label="Hapus">×</button></div>`;
 const mundur=(d,n)=>{const t=new Date(d+"T12:00:00");t.setDate(t.getDate()-n);return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate())};
 const prevDay=d=>mundur(d,1);
 const dateBounds=()=>{if(role==="kasir"){$("sd").min=$("ed").min=mundur(now(),kasirHari);$("sd").max=$("ed").max=now()}};
@@ -220,7 +239,7 @@ function detect(kat,desc){const d=(desc||"").toLowerCase(),e=ITM.find(x=>x[1].te
  let qty=0,unit="";for(const u of us){const m=d.match(new RegExp("(\\d+(?:[.,]\\d+)?)\\s*"+u+"\\b"));if(m){qty=+m[1].replace(",",".");unit=u;break}}
  return{item:it,qty,unit}}
 function autoItem(){if(!$("ei").dataset.man){const r=detect($("ek").value,$("ex").value);$("ei").value=r.item;if(!$("ej").dataset.man)$("ej").value=r.item&&r.qty?r.qty:"";if(!$("eu").dataset.man)$("eu").value=r.item?r.unit:""}
- const i=$("ei").value;$("isum").textContent="Barang untuk riwayat harga"+(i?": "+i+($("ej").value?" · "+$("ej").value+" "+$("eu").value:"")+($("ei").dataset.man?"":" (otomatis)"):" (opsional)")}
+ const i=$("ei").value;$("eq").style.display=i?"grid":"none";$("isum").textContent=i&&!$("ei").dataset.man?"Terdeteksi otomatis. Ubah bila keliru.":""}
 function delSetoran(d){if(locked)return toast("Bulan ini dikunci. Buka kunci dulu.");const old=st.setoran[d];if(!old)return;
  delete st.setoran[d];render();send("setoran",{date:d,t:0,n:0,k:""});
  toast("Setoran tanggal "+d.slice(8)+" dihapus",()=>{st.setoran[d]=old;render();send("setoran",{date:d,t:old.t,n:old.n,k:old.k||""})})}
@@ -236,7 +255,7 @@ async function itemsView(){const v=$("view");v.innerHTML='<div class="empty">Mem
   if(!L.length)return `<div class="card" style="margin-bottom:12px"><h2>${nm}</h2><div class="note" style="margin-top:0">Belum ada pembelian. Pilih “Barang” saat mencatat pengeluaran.</div></div>`;
   const u=x=>x.qty?x.amt/x.qty:null,a=L[0],b=L[1],asc=[...L].reverse(),gaps=asc.slice(1).map((x,i)=>dd(x.date,asc[i].date)).filter(g=>g>0),avg=gaps.length?Math.round(gaps.reduce((s,g)=>s+g,0)/gaps.length):0,since=dd(td,a.date);
   const pr=u(a)!=null&&b&&u(b)!=null?ch(u(a),u(b))+" per "+(a.unit||"satuan"):(b?ch(a.amt,b.amt)+" dari pembelian sebelumnya":"");
-  return `<div class="card" style="margin-bottom:12px"><h2>${nm}</h2><div class="note" style="margin-top:0">Terakhir dibeli ${a.date} · ${rp(a.amt)}${a.qty?` · ${a.qty} ${esc(a.unit)} (${rp(u(a))}/${esc(a.unit||"satuan")})`:""}</div>${pr?`<div style="margin:6px 0"><b>${pr}</b></div>`:""}<div class="note">${avg?`Rata-rata beli tiap ${avg} hari · sudah ${since} hari sejak pembelian terakhir${since>=avg?" — kemungkinan hampir habis":""}`:`Sudah ${since} hari sejak pembelian terakhir`}</div><div style="margin-top:8px">${L.slice(0,6).map(x=>`<div class="dr"><span>${x.date.slice(5)}</span><span class="dd">${x.qty?x.qty+" "+esc(x.unit):"–"}</span><b>${rp(x.amt)}</b></div>`).join("")}</div></div>`}).join("")}
+  return `<div class="card" style="margin-bottom:12px"><h2>${nm}</h2><div class="note" style="margin-top:0">Terakhir dibeli ${tgl(a.date)} · ${rp(a.amt)}${a.qty?` · ${a.qty} ${esc(a.unit)} (${rp(u(a))}/${esc(a.unit||"satuan")})`:""}</div>${pr?`<div style="margin:6px 0"><b>${pr}</b></div>`:""}<div class="note">${avg?`Rata-rata beli tiap ${avg} hari · sudah ${since} hari sejak pembelian terakhir${since>=avg?" — kemungkinan hampir habis":""}`:`Sudah ${since} hari sejak pembelian terakhir`}</div><div style="margin-top:8px">${L.slice(0,6).map(x=>`<div class="dr"><span>${tgs(x.date)}</span><span class="dd">${x.qty?x.qty+" "+esc(x.unit):"–"}</span><b>${rp(x.amt)}</b></div>`).join("")}</div></div>`}).join("")}
 function fillList(){const q=fq.toLowerCase(),f=fq||fk||fm;
  const L=st.exp.filter(e=>e.date.startsWith(mk)&&(!fk||e.kat===fk)&&(!fm||e.met===fm)&&(!q||[e.desc,e.kat,e.met].join(" ").toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
  $("ban").innerHTML=`<div class="ban"><div><small>${f?"Total hasil filter":"Total pengeluaran bulan ini"}</small><br><b>${rp(L.reduce((a,e)=>a+e.amt,0))}</b></div><div style="text-align:right"><small>Jumlah transaksi</small><br><b>${L.length}</b></div></div>`;
@@ -244,31 +263,32 @@ function fillList(){const q=fq.toLowerCase(),f=fq||fk||fm;
 async function cmp(c){const pk=prevKey(mk);try{if(!pc[pk]){if(!tok()||getQ().length)return;const j=await api("load",{month:pk});pc[pk]={s:Object.values(j.setoran).reduce((a,z)=>a+z.t+z.n,0),e:j.exp.reduce((a,z)=>a+z.amt,0)}}
  const p=pc[pk],s=c.T.st+c.T.sn,e=c.T.et+c.T.en,ch=(a,b)=>b?(a>=b?"▲ ":"▼ ")+Math.abs(Math.round((a-b)/b*100))+"%":"–";
  if(!$("cmp")||pk!==prevKey(mk))return;
+ if(!p.s&&!p.e){$("cmp").innerHTML=`<h2 style="margin-top:22px">Dibanding Bulan Lalu</h2><div class="note" style="margin-top:0">Belum ada data bulan lalu untuk dibandingkan.</div>`;return}
  $("cmp").innerHTML=`<h2 style="margin-top:22px">Dibanding Bulan Lalu</h2><div class="scroll"><table style="min-width:0"><thead><tr><th></th><th>Bulan ini</th><th>Bulan lalu</th><th>Perubahan</th></tr></thead><tbody>${[["Setoran",s,p.s],["Pengeluaran",e,p.e],["Selisih",s-e,p.s-p.e]].map(r=>`<tr style="cursor:default"><td>${r[0]}</td><td>${rp(r[1])}</td><td>${rp(r[2])}</td><td>${r[0]==="Selisih"?"":ch(r[1],r[2])}</td></tr>`).join("")}</tbody></table></div>`}catch(x){}}
 function render(){
- if(role==="kasir")return kasirRender();fillKat();$("lkh").textContent=locked?" 🔒":"";$("blk").textContent=locked?"🔓 Buka kunci bulan ini":"🔒 Kunci bulan ini";const c=calc(mk),[y,m]=mk.split("-").map(Number);
+ if(role==="kasir")return kasirRender();fillKat();$("lkh").innerHTML=locked?" "+LOCK:"";$("blk").innerHTML=locked?UNLOCK+" Buka kunci bulan ini":LOCK+" Kunci bulan ini";const c=calc(mk),[y,m]=mk.split("-").map(Number);
  $("mm").innerHTML=BL.map((n,i)=>`<option value="${pad(i+1)}"${i+1===m?" selected":""}>${n}</option>`).join("");
  const y0=new Date().getFullYear();$("yy").innerHTML=[...new Set([y0-3,y0-2,y0-1,y0,y0+1,y])].sort().map(t=>`<option${t===y?" selected":""}>${t}</option>`).join("");
  $("cards").innerHTML=`<div class="hero"><div class="hl">Total saldo</div><div class="hv ${c.bt+c.bn<0?"neg":""}">${rp(c.bt+c.bn)}</div><div class="hchips"><div><small>Kas tunai</small><b class="${c.bt<0?"neg":""}">${rp(c.bt)}</b></div><div><small>Non-tunai</small><b class="${c.bn<0?"neg":""}">${rp(c.bn)}</b></div></div><div class="hs">Saldo awal bulan: tunai ${rp(c.o.t)} · non-tunai ${rp(c.o.n)}</div></div>
  <div class="card kpi i"><div class="lb">Setoran bulan ini</div><div class="v">${rp(c.T.st+c.T.sn)}</div><div class="s">Tunai ${rp(c.T.st)} · Non-tunai ${rp(c.T.sn)}</div></div>
  <div class="card kpi o"><div class="lb">Pengeluaran</div><div class="v">${rp(c.T.et+c.T.en)}</div><div class="s">Tunai ${rp(c.T.et)} · QRIS/Transfer ${rp(c.T.en)}</div></div>`;
- $("ot").value=c.o.t;$("on").value=c.o.n;
+ $("ot").value=fmtN(c.o.t);$("on").value=fmtN(c.o.n);
  document.querySelectorAll("#tabs button,#bnav button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));
  const v=$("view");
  if(tab==="harian"){const td=now(),ms=c.days.filter(x=>x.d<td&&!st.setoran[x.d]).map(x=>pad(x.i)),mb=ms.length?`<div class="warnb">⚠ ${ms.length} hari belum ada setoran: tanggal ${ms.join(", ")}. Hari libur boleh dilewati.</div>`:"";
-  const f=n=>n?n.toLocaleString("id-ID"):"–",sf=n=>(n<0?"-":"")+Math.abs(n).toLocaleString("id-ID"),two=(a,b)=>`<div class="c1">${f(a)}</div><div class="c2">${f(b)}</div>`,twoS=(a,b)=>`<div class="c1 ${a<0?"neg":""}">${sf(a)}</div><div class="c2 ${b<0?"neg":""}">${sf(b)}</div>`;
-  const mrows=c.days.map(x=>{const k=(st.setoran[x.d]||{}).k;return `<tr data-d="${x.d}" class="${x.d===td?"today ":""}${x.d<td&&!st.setoran[x.d]?"miss":""}"><td><b>${pad(x.i)}</b><small>${new Date(x.y,x.m-1,x.i).toLocaleDateString("id-ID",{weekday:"short"})}</small></td><td>${two(x.s.t,x.s.n)}</td><td class="ex">${two(x.et,x.en)}</td><td class="sl">${twoS(x.bt,x.bn)}</td><td style="text-align:center;white-space:nowrap"><button class="x" data-sed="${x.d}" aria-label="Isi atau ubah setoran">✎</button>${st.setoran[x.d]?`<button class="x" data-sdel="${x.d}" aria-label="Hapus setoran">×</button>`:""}</td></tr>`+(k?`<tr class="nt"><td colspan="5">${esc(k)}</td></tr>`:"")}).join("");
+  const f=n=>n?n.toLocaleString("id-ID"):"–",fe=n=>n?`<span class="neg">${n.toLocaleString("id-ID")}</span>`:"–",sf=n=>(n<0?"-":"")+Math.abs(n).toLocaleString("id-ID"),two=(a,b)=>`<div class="c1">${f(a)}</div><div class="c2">${f(b)}</div>`,twoS=(a,b)=>`<div class="c1 ${a<0?"neg":""}">${sf(a)}</div><div class="c2 ${b<0?"neg":""}">${sf(b)}</div>`;
+  const mrows=c.days.map(x=>{const k=(st.setoran[x.d]||{}).k;return `<tr data-d="${x.d}" class="${x.d===td?"today ":""}${x.d<td&&!st.setoran[x.d]?"miss ":""}${x.d!==td&&!st.setoran[x.d]&&!x.et&&!x.en?"idle":""}"><td><b>${pad(x.i)}</b><small>${new Date(x.y,x.m-1,x.i).toLocaleDateString("id-ID",{weekday:"short"})}</small></td><td>${two(x.s.t,x.s.n)}</td><td class="ex">${two(x.et,x.en)}</td><td class="sl">${twoS(x.bt,x.bn)}</td><td style="text-align:center;white-space:nowrap"><button class="x" data-sed="${x.d}" aria-label="Isi atau ubah setoran">${PEN}</button>${st.setoran[x.d]?`<button class="x" data-sdel="${x.d}" aria-label="Hapus setoran">×</button>`:""}</td></tr>`+(k?`<tr class="nt"><td colspan="5">${esc(k)}</td></tr>`:"")}).join("");
   const mob=`<div class="mob"><div class="lg2"><span><span class="dot" style="background:var(--t)"></span> Tunai</span><span><span class="dot" style="background:var(--n)"></span> Non-tunai</span></div><table class="mt"><thead><tr><th>Tgl</th><th>Setoran</th><th>Keluar</th><th>Saldo</th><th></th></tr></thead><tbody>${mrows}</tbody><tfoot><tr><td>Total</td><td>${two(c.T.st,c.T.sn)}</td><td class="ex">${two(c.T.et,c.T.en)}</td><td>${twoS(c.bt,c.bn)}</td><td></td></tr></tfoot></table></div>`;
-  v.innerHTML=mb+`<div class="scroll dsk"><table><thead><tr><th>Tanggal</th><th>Setoran Tunai</th><th>Setoran Non-Tunai</th><th>Keluar Tunai</th><th>Keluar Non-Tunai</th><th>Saldo Tunai</th><th>Saldo Non-Tunai</th><th>Keterangan</th><th></th></tr></thead><tbody>`+
-  c.days.map(x=>`<tr data-d="${x.d}" class="${x.d===td?"today ":""}${x.d<td&&!st.setoran[x.d]?"miss":""}"><td>${pad(x.i)} ${new Date(x.y,x.m-1,x.i).toLocaleDateString("id-ID",{weekday:"short"})}</td><td>${money(x.s.t)}</td><td>${money(x.s.n)}</td><td>${money(-x.et)}</td><td>${money(-x.en)}</td><td class="bt">${rp(x.bt).replace(/^(-?)/,"$1")}</td><td class="bn">${rp(x.bn)}</td><td style="text-align:left;color:var(--mu);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((st.setoran[x.d]||{}).k||"")}</td><td style="white-space:nowrap"><button class="x" data-sed="${x.d}" aria-label="Isi atau ubah setoran">✎</button>${st.setoran[x.d]?`<button class="x" data-sdel="${x.d}" aria-label="Hapus setoran">×</button>`:""}</td></tr>`).join("")+
-  `</tbody><tfoot><tr><td>Total</td><td>${rp(c.T.st)}</td><td>${rp(c.T.sn)}</td><td>${rp(c.T.et)}</td><td>${rp(c.T.en)}</td><td>${rp(c.bt)}</td><td>${rp(c.bn)}</td><td></td><td></td></tr></tfoot></table></div>
+  v.innerHTML=mb+`<div class="note dsk" style="margin:0 0 8px">Semua angka dalam Rupiah.</div><div class="scroll dsk"><table><thead><tr><th>Tanggal</th><th>Setoran Tunai</th><th>Setoran Non-Tunai</th><th>Keluar Tunai</th><th>Keluar Non-Tunai</th><th>Saldo Tunai</th><th>Saldo Non-Tunai</th><th>Keterangan</th><th></th></tr></thead><tbody>`+
+  c.days.map(x=>`<tr data-d="${x.d}" class="${x.d===td?"today ":""}${x.d<td&&!st.setoran[x.d]?"miss ":""}${x.d!==td&&!st.setoran[x.d]&&!x.et&&!x.en?"idle":""}"><td>${pad(x.i)} ${new Date(x.y,x.m-1,x.i).toLocaleDateString("id-ID",{weekday:"short"})}</td><td>${f(x.s.t)}</td><td>${f(x.s.n)}</td><td>${fe(x.et)}</td><td>${fe(x.en)}</td><td class="bt ${x.bt<0?"neg":""}">${sf(x.bt)}</td><td class="bn ${x.bn<0?"neg":""}">${sf(x.bn)}</td><td style="text-align:left;color:var(--mu);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((st.setoran[x.d]||{}).k||"")}</td><td style="white-space:nowrap"><button class="x" data-sed="${x.d}" aria-label="Isi atau ubah setoran">${PEN}</button>${st.setoran[x.d]?`<button class="x" data-sdel="${x.d}" aria-label="Hapus setoran">×</button>`:""}</td></tr>`).join("")+
+  `</tbody><tfoot><tr><td>Total</td><td>${f(c.T.st)}</td><td>${f(c.T.sn)}</td><td>${f(c.T.et)}</td><td>${f(c.T.en)}</td><td>${sf(c.bt)}</td><td>${sf(c.bn)}</td><td></td><td></td></tr></tfoot></table></div>
   ${mob}
   <div class="note">Klik baris tanggal untuk mengisi atau mengubah setoran hari itu.</div>`;
  }else if(tab==="item"){itemsView();
  }else if(tab==="exp"){
   v.innerHTML=`<div class="tool"><input id="fq" placeholder="Cari deskripsi, kategori, metode…" value="${esc(fq)}"><select id="fk"><option value="">Semua kategori</option>${cats().map(k=>`<option${k===fk?" selected":""}>${esc(k)}</option>`).join("")}</select><select id="fm"><option value="">Semua metode</option>${["Tunai","Transfer","QRIS"].map(k=>`<option${k===fm?" selected":""}>${k}</option>`).join("")}</select></div><div id="ban"></div><div id="elist"></div>`;
   $("fq").oninput=e=>{fq=e.target.value;fillList()};$("fk").onchange=e=>{fk=e.target.value;fillList()};$("fm").onchange=e=>{fm=e.target.value;fillList()};fillList();
-  if((st.kats||[]).length)v.insertAdjacentHTML("afterbegin",`<div style="margin-bottom:12px"><small style="color:var(--mu)">Kategori buatan Anda:</small> ${st.kats.map((k,i)=>`<span class="chip">${esc(k)} <button class="x" style="font-size:12px;padding:0 2px" data-kr="${i}" aria-label="Ubah nama">✎</button><button class="x" style="font-size:14px;padding:0 2px" data-k="${i}" aria-label="Hapus kategori">×</button></span>`).join("")}</div>`);
+  if((st.kats||[]).length)v.insertAdjacentHTML("afterbegin",`<div style="margin-bottom:12px"><small style="color:var(--mu)">Kategori buatan Anda:</small> ${st.kats.map((k,i)=>`<span class="chip">${esc(k)} <button class="x" style="font-size:12px;padding:0 2px" data-kr="${i}" aria-label="Ubah nama">${PEN}</button><button class="x" style="font-size:14px;padding:0 2px" data-k="${i}" aria-label="Hapus kategori">×</button></span>`).join("")}</div>`);
  }else{
   const rows=cats().map(k=>{let t=0,n=0;st.exp.forEach(e=>{if(e.date.startsWith(mk)&&e.kat===k){if(e.met==="Tunai")t+=e.amt;else n+=e.amt}});return{k,t,n,s:t+n}});
   const TT=rows.reduce((a,r)=>({t:a.t+r.t,n:a.n+r.n}),{t:0,n:0}),G=TT.t+TT.n,dash='<span class="z">–</span>';
@@ -294,7 +314,7 @@ $("prev").onclick=()=>{mk=prevKey(mk);loadMonth()};
 $("next").onclick=()=>{let[y,m]=mk.split("-").map(Number);m++;if(m>12){m=1;y++}mk=y+"-"+pad(m);loadMonth()};
 $("theme").onclick=()=>{const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark"};
 $("tabs").onclick=e=>{const b=e.target.closest("button");if(b){tab=b.dataset.t;render()}};
-$("bnav").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.t){tab=b.dataset.t;render();window.scrollTo({top:0,behavior:"smooth"})}else document.querySelector(".side").scrollIntoView({behavior:"smooth"})};
+$("bnav").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.t){tab=b.dataset.t;render()}else document.querySelector(".side").scrollIntoView({behavior:"smooth"})};
 $("seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;met=b.dataset.m;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));hint()};
 $("view").onclick=e=>{
  const sdl=e.target.closest("[data-sdel]");if(sdl){delSetoran(sdl.dataset.sdel);return}
@@ -326,7 +346,7 @@ $("ex").oninput=autoItem;$("ek").onchange=autoItem;$("ej").oninput=()=>{$("ej").
 $("blk").onclick=()=>{locked=!locked;send("lock",{month:mk,on:locked});render();toast(locked?"Bulan "+mk+" dikunci":"Kunci bulan dibuka")};
 $("blog").onclick=async()=>{const w=document.createElement("div");w.className="modal on";w.innerHTML='<div class="card"><h2>Catatan Perubahan<button class="x" data-close style="margin-left:auto">×</button></h2><div id="logb">Memuat…</div></div>';w.onclick=e=>{if(e.target===w||e.target.closest("[data-close]"))w.remove()};document.body.appendChild(w);
  try{const j=await api("log");$("logb").innerHTML=j.rows.map(r=>`<div class="dr" style="flex-wrap:wrap"><span>${esc(r[0])}</span><b>${esc(r[1])}</b><span>${esc(r[2])}</span><span class="dd" style="white-space:normal;flex-basis:100%">${esc(r[3])}</span></div>`).join("")||"Belum ada catatan."}catch(e){$("logb").textContent="Gagal memuat."}};
-const setOpen=()=>{if(locked){render();return toast("Bulan ini dikunci. Buka kunci dulu.")}const o={t:+$("ot").value||0,n:+$("on").value||0};st.opening[mk]=o;render();send("opening",{month:mk,...o})};
+const setOpen=()=>{if(locked){render();return toast("Bulan ini dikunci. Buka kunci dulu.")}const o={t:pn($("ot").value),n:pn($("on").value)};st.opening[mk]=o;render();send("opening",{month:mk,...o})};
 $("ot").onchange=setOpen;$("on").onchange=setOpen;
 $("undo").onclick=()=>{if(undoFn)undoFn();$("toast").classList.remove("on")};
 function loadXlsx(){return new Promise((res,rej)=>{if(window.XLSX)return res();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
