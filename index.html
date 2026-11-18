@@ -308,7 +308,7 @@ function opWa(){const need=op.items.filter(it=>opFilled(it)&&opSisa(it)<=it.bata
  const t=`*Daftar belanja · Kedai Rapi Laundry*\nOpname ${rng(op.week,op.weekEnd)}${op.header.petugas?" · "+op.header.petugas:""}\n\n`+need.map((it,i)=>`${i+1}. ${it.nama} · sisa ${opSisa(it)} ${it.satuan} (batas ${it.batas})`).join("\n");
  window.open("https://wa.me/"+(op.wa||"")+"?text="+encodeURIComponent(t),"_blank")}
 function opAct(a,d){
- if(["ks","badd","be","bh","bs","bd","wasave"].includes(a))return kAct(a,d);
+ if(["ks","badd","be","bh","bs","bd","wasave","kadd","kren","kdel"].includes(a))return kAct(a,d);
  if(a==="sub"){opSub=d.v;render();return}
  if(a==="cat"){opCat=d.v;opPaint();return}
  if(a==="wa")return opWa();
@@ -322,28 +322,41 @@ function opAct(a,d){
  if(a==="koreksi"){opEdit=true;opPaint();return}
  if(a==="lock"||a==="unlock"){const s=a==="lock"?"terkunci":"selesai";send("opStatus",{week:op.week,status:s});op.header.status=s;opEdit=false;opPaint();toast(a==="lock"?"Opname dikunci":"Kunci dibuka")}}
 async function kelolaView(){const v=$("view");
- if(!kList){v.innerHTML='<div class="empty">Memuat daftar barang…</div>';try{kList=await api("bList")}catch(e){v.innerHTML='<div class="empty">Gagal memuat. Periksa koneksi.</div>';return}}
+ if(!kList){v.innerHTML='<div class="empty">Memuat daftar barang…</div>';try{kList=await api("bList");kList.kats=kList.kats||[...new Set(kList.items.map(i=>i.kat))]}catch(e){v.innerHTML='<div class="empty">Gagal memuat. Periksa koneksi.</div>';return}}
  if(tab!=="op"||opSub!=="kelola")return;
- const act=kList.items.filter(i=>i.aktif),hid=kList.items.filter(i=>!i.aktif),L=kSub?hid:act;
+ const act=kList.items.filter(i=>i.aktif),hid=kList.items.filter(i=>!i.aktif),L=kSub?hid:act,cnt=k=>kList.items.filter(i=>i.kat===k).length;
  v.innerHTML=`<div class="tabs" style="margin-bottom:12px"><button data-act="sub" data-v="op">Opname</button><button class="on" data-act="sub" data-v="kelola">Kelola Barang</button></div>
  <div class="card" style="margin-bottom:12px"><label for="kwa" style="margin-top:0">Nomor WhatsApp pemilik (tujuan daftar belanja)</label><div style="display:flex;gap:8px"><input id="kwa" inputmode="tel" placeholder="08xxxxxxxxxx" value="${esc(kList.wa||"")}"><button class="btn" data-act="wasave">Simpan</button></div></div>
+ <div class="card" style="margin-bottom:12px"><h2>Kategori barang</h2><div style="display:flex;flex-wrap:wrap;gap:8px">${kList.kats.map(k=>`<span class="chip" style="display:inline-flex;align-items:center;gap:2px;margin:0">${esc(k)} · ${cnt(k)}<button class="x" data-act="kren" data-v="${esc(k)}" aria-label="Ubah nama ${esc(k)}">${PEN}</button>${cnt(k)?"":`<button class="x" data-act="kdel" data-v="${esc(k)}" aria-label="Hapus kategori ${esc(k)}">×</button>`}</span>`).join("")||'<span class="note" style="margin:0">Belum ada kategori.</span>'}</div><div style="display:flex;gap:8px;margin-top:12px"><input id="kcn" placeholder="Nama kategori baru" maxlength="24"><button class="btn" data-act="kadd">Tambah</button></div></div>
  <div style="display:flex;gap:8px;margin-bottom:12px"><div class="tabs" style="flex:1;margin:0"><button class="${kSub?"":"on"}" data-act="ks" data-v="0">Aktif (${act.length})</button><button class="${kSub?"on":""}" data-act="ks" data-v="1">Tersembunyi (${hid.length})</button></div><button class="btn add2" data-act="badd">+ Barang</button></div>
  ${kSub?`<div class="note" style="margin:0 0 10px">Barang tersembunyi tidak muncul di opname baru. Riwayat opname lama tetap aman.</div>`:""}
  ${L.map(it=>`<div class="kr"><div style="flex:1;min-width:0"><b>${esc(it.nama)}</b><small>${esc(it.satuan)} · ${esc(it.kat)} · batas beli ${it.batas}</small></div>${kSub?`<button class="btn" data-act="bs" data-id="${it.id}">Tampilkan</button><button class="btn dng" data-act="bd" data-id="${it.id}">Hapus</button>`:`<button class="x" data-act="be" data-id="${it.id}" aria-label="Ubah ${esc(it.nama)}">${PEN}</button><button class="x" data-act="bh" data-id="${it.id}" aria-label="Sembunyikan ${esc(it.nama)}">${EYEOFF}</button>`}</div>`).join("")||'<div class="empty">Tidak ada barang.</div>'}`}
-async function kAct(a,d){try{
+async function kAct(a,d){const it=d.id?kList.items.find(i=>i.id===d.id):null;
  if(a==="ks"){kSub=+d.v;kelolaView();return}
  if(a==="badd")return barangForm();
- if(a==="be")return barangForm(kList.items.find(i=>i.id===d.id));
- if(a==="wasave"){const j=await api("setWa",{wa:$("kwa").value});kList.wa=j.wa;$("kwa").value=j.wa;op=null;toast("Nomor WhatsApp tersimpan");return}
- if(a==="bh")await api("bHide",{id:d.id,on:true});
- else if(a==="bs")await api("bHide",{id:d.id,on:false});
- else if(a==="bd"){const it=kList.items.find(i=>i.id===d.id);if(!confirm("Hapus permanen “"+it.nama+"”?\nAngka di opname lama tetap tersimpan dan nama barangnya tetap terbaca."))return;await api("bDel",{id:d.id})}
- kList=null;op=null;kelolaView()}catch(e){toast(e.message==="bad_number"?"Nomor WhatsApp tidak valid":"Gagal menyimpan. Periksa koneksi.")}}
-function barangForm(it){it=it||{id:"",nama:"",satuan:"pcs",kat:"",batas:1,stok:0};const w=document.createElement("div");w.className="modal on";
- w.innerHTML=`<div class="card"><h2>${it.id?"Ubah":"Tambah"} Barang<button class="x" data-close style="margin-left:auto" aria-label="Tutup">×</button></h2><label for="bn">Nama barang</label><input id="bn" value="${esc(it.nama)}" maxlength="60"><div class="row2"><div><label for="bs">Satuan</label><input id="bs" value="${esc(it.satuan)}" maxlength="12"></div><div><label for="bk">Kategori</label><input id="bk" list="bkl" value="${esc(it.kat)}" maxlength="24"></div></div><datalist id="bkl">${[...new Set(kList.items.map(i=>i.kat))].map(k=>`<option value="${esc(k)}">`).join("")}</datalist><div class="row2"><div><label for="bb">Batas beli ulang</label><input id="bb" type="number" min="0" step="any" value="${it.batas}"></div><div><label for="bt">Stok awal</label><input id="bt" type="number" min="0" step="any" value="${it.stok}"></div></div><button class="primary" id="bsave">Simpan barang</button></div>`;
+ if(a==="be")return barangForm(it);
+ if(a==="wasave"){const b=$("kwa").nextElementSibling;b.disabled=true;b.textContent="Menyimpan…";
+  try{const j=await api("setWa",{wa:$("kwa").value});kList.wa=j.wa;$("kwa").value=j.wa;op=null;toast("Nomor WhatsApp tersimpan")}catch(e){toast(e.message==="bad_number"?"Nomor WhatsApp tidak valid":"Gagal menyimpan. Periksa koneksi.")}
+  b.disabled=false;b.textContent="Simpan";return}
+ if(a==="bh"||a==="bs"){it.aktif=a==="bs";send("bHide",{id:it.id,on:a==="bh"});op=null;kelolaView();toast(a==="bh"?"Barang disembunyikan":"Barang ditampilkan lagi");return}
+ if(a==="bd"){if(!confirm("Hapus permanen “"+it.nama+"”?\nAngka di opname lama tetap tersimpan dan nama barangnya tetap terbaca."))return;kList.items=kList.items.filter(i=>i.id!==it.id);send("bDel",{id:it.id});op=null;kelolaView();toast("Barang dihapus permanen");return}
+ if(a==="kadd"){const n=$("kcn").value.trim().slice(0,24);if(!n)return toast("Isi nama kategori");if(kList.kats.some(k=>k.toLowerCase()===n.toLowerCase()))return toast("Kategori itu sudah ada");
+  kList.kats.push(n);send("bKat",{op:"add",nama:n});kelolaView();toast("Kategori ditambahkan");return}
+ if(a==="kren"){const old=d.v,nv=(prompt("Nama baru untuk kategori “"+old+"”:",old)||"").trim().slice(0,24);if(!nv||nv===old)return;if(kList.kats.some(k=>k.toLowerCase()===nv.toLowerCase()))return toast("Kategori itu sudah ada");
+  kList.kats=kList.kats.map(k=>k===old?nv:k);kList.items.forEach(i=>{if(i.kat===old)i.kat=nv});send("bKat",{op:"rename",from:old,to:nv});op=null;kelolaView();toast("Nama kategori diubah");return}
+ if(a==="kdel"){kList.kats=kList.kats.filter(k=>k!==d.v);send("bKat",{op:"del",nama:d.v});kelolaView()}}
+function barangForm(it){it=it||{id:"",nama:"",satuan:"pcs",kat:kList.kats[0]||"",batas:1,stok:0};const w=document.createElement("div");w.className="modal on";
+ w.innerHTML=`<div class="card"><h2>${it.id?"Ubah":"Tambah"} Barang<button class="x" data-close style="margin-left:auto" aria-label="Tutup">×</button></h2><label for="bn">Nama barang</label><input id="bn" value="${esc(it.nama)}" maxlength="60"><div class="row2"><div><label for="bs">Satuan</label><input id="bs" value="${esc(it.satuan)}" maxlength="12"></div><div><label for="bk">Kategori</label><select id="bk">${kList.kats.map(k=>`<option${k===it.kat?" selected":""}>${esc(k)}</option>`).join("")}<option value="__new">＋ Kategori baru…</option></select></div></div><input id="bkn" placeholder="Nama kategori baru" maxlength="24" style="display:none;margin-top:8px"><div class="row2"><div><label for="bb">Batas beli ulang</label><input id="bb" type="number" min="0" step="any" value="${it.batas}"></div><div><label for="bt">Stok awal</label><input id="bt" type="number" min="0" step="any" value="${it.stok}"></div></div><button class="primary" id="bsave">Simpan barang</button></div>`;
  w.onclick=e=>{if(e.target===w||e.target.closest("[data-close]"))w.remove()};document.body.appendChild(w);
- w.querySelector("#bsave").onclick=async()=>{const item={id:it.id,nama:$("bn").value.trim(),satuan:$("bs").value.trim()||"pcs",kat:$("bk").value.trim()||"Lainnya",batas:+$("bb").value||0,stok:+$("bt").value||0};
-  if(!item.nama)return toast("Isi nama barang");try{await api("bSave",{item});w.remove();kList=null;op=null;kelolaView();toast("Barang tersimpan")}catch(e){toast("Gagal menyimpan barang")}}}
+ w.querySelector("#bk").onchange=e=>{const n=$("bkn");n.style.display=e.target.value==="__new"?"block":"none";if(e.target.value==="__new")n.focus()};
+ let busy=false;
+ w.querySelector("#bsave").onclick=()=>{if(busy)return;const sel=$("bk").value,kat=sel==="__new"?$("bkn").value.trim().slice(0,24):sel,nama=$("bn").value.trim();
+  if(!nama)return toast("Isi nama barang");if(!kat)return toast("Pilih kategori atau isi nama kategori baru");
+  busy=true;const b=$("bsave");b.disabled=true;b.textContent="Menyimpan…";
+  const id=it.id||"B"+Date.now().toString(36).toUpperCase(),item={id,nama,satuan:$("bs").value.trim()||"pcs",kat,batas:+$("bb").value||0,stok:+$("bt").value||0};
+  const i=kList.items.findIndex(x=>x.id===id),rec={...item,aktif:i>=0?kList.items[i].aktif:true};if(i>=0)kList.items[i]=rec;else kList.items.push(rec);
+  if(!kList.kats.includes(kat))kList.kats.push(kat);
+  send("bSave",{item});op=null;w.remove();kelolaView();toast("Barang tersimpan")}}
 function setMet(m){met=m;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x.dataset.m===m))}
 function editExpense(it){if(locked)return toast("Bulan ini dikunci. Buka kunci dulu.");editId=it.id;$("ed").value=it.date;$("ek").value=it.kat;$("ea").value=it.amt;$("ex").value=it.desc;$("ei").value=it.item||"";$("ej").value=it.qty||"";$("eu").value=it.unit||"";setMet(it.met);["ei","ej","eu"].forEach(i=>delete $(i).dataset.man);if(it.item&&it.item!=="Detergen")$("ei").dataset.man="1";if(it.qty)$("ej").dataset.man="1";if(it.unit)$("eu").dataset.man="1";autoItem();$("saveE").textContent="Simpan Perubahan";hint();openM(mE,"ea")}
 function renameKat(i){const old=st.kats[i],nv=(prompt("Nama baru untuk kategori “"+old+"”:",old)||"").trim().slice(0,30);if(!nv||nv===old)return;if(cats().some(k=>k.toLowerCase()===nv.toLowerCase()))return toast("Nama kategori itu sudah ada");st.kats[i]=nv;st.exp.forEach(e=>{if(e.kat===old)e.kat=nv});send("renameKat",{from:old,to:nv});render()}
